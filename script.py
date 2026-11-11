@@ -139,9 +139,21 @@ def extract_salary(structured_salary, description):
 
 
 ESTADOS={"acre","amazonas","amapa","para","rondonia","roraima","tocantins"}
-CIDADES={"rio branco","manaus","macapa","belem","porto velho","boa vista","palmas"}
+SIGLAS_ESTADOS={
+    "ac":"acre","am":"amazonas","ap":"amapa","pa":"para",
+    "ro":"rondonia","rr":"roraima","to":"tocantins",
+}
+
 def matches(city,state,title,desc):
-    return norm(state) in ESTADOS and norm(city) in CIDADES
+    state_norm=SIGLAS_ESTADOS.get(norm(state),norm(state))
+    city_norm=norm(city)
+    # Aceita todas as cidades dos estados do Norte, não apenas as capitais.
+    # Rejeita registros sem cidade real (quando city repete o nome do estado).
+    return (
+        state_norm in ESTADOS
+        and bool(city_norm)
+        and city_norm not in ESTADOS
+    )
 
 def norm(s):
     s = unicodedata.normalize("NFKD", (s or "").strip().lower())
